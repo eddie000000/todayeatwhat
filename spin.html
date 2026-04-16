@@ -305,37 +305,22 @@ body {
 
 <script>
 const BREAKFAST = [
-  {name:"怡寶吐司",            addr:"台中市西區花美街86號",              rating:4.8, pid:"ChIJC-uK3XI9aTQRoXxqGLMJNNo"},
-  {name:"港式良好早餐店",       addr:"台中市西區中城街38號",              rating:4.3, pid:"ChIJx4IAHCU9aTQR1U2WMHWH3xk"},
-  {name:"自製早餐店",           addr:"台中市西區永安街21號",              rating:4.6, pid:"ChIJAXvaLEA9aTQRqcZBDMSc_4M"},
-  {name:"嘉香早餐",             addr:"台中市南屯區大業路143號",           rating:4.2, pid:"ChIJtVJ51ZY9aTQRy2BJtIO8GFQ"},
-  {name:"三口ㄟ了（勤美店）",   addr:"台中市西區中興街55號",              rating:4.6, pid:"ChIJIafwbM49aTQRIx0JzvJ6IoY"},
-  {name:"路邊也！",             addr:"台中市西區中美街311號",             rating:4.6, pid:"ChIJzRFaMpk9aTQRXYq5nbmICTk"},
-  {name:"艾初早餐 英才店",      addr:"台中市西區英才路399號",             rating:4.4, pid:"ChIJdT01lMY9aTQRBvMya3mKs6Q"},
-  {name:"上山採蕨",             addr:"台中市西區昇平街43號",              rating:4.7, pid:"ChIJvcAlfwY9aTQRQ5vbnMOUbLY"},
-  {name:"中式早餐店",           addr:"台中市西區向上北路284巷22號",       rating:4.8, pid:"ChIJb5DmmQM9aTQRwmTACmbaoRY"},
-  {name:"Tacit Cafe",           addr:"台中市西區中美街185號",             rating:4.8, pid:"ChIJ6YfIalQ9aTQRbPFo2_LPdg4"},
-  {name:"食半晌米",             addr:"台中市西區大明街13號1樓",           rating:4.8, pid:"ChIJSYG6tE89aTQRBBVtPw496lI"},
+  {name:"早安有喜 北屯店", addr:"台中市北屯區松竹路二段663號", rating:4.4, pid:"ChIJR57vXGATaTQR9IuA8E-6k5I"},
+  {name:"Q Burger 台中崇德店", addr:"台中市北屯區崇德路三段689號", rating:4.1, pid:"ChIJm2n93GATaTQRuE16N76y28o"},
+  {name:"日正豆漿 崇德店", addr:"台中市北屯區崇德路三段850號", rating:4.3, pid:"ChIJqX0f7mETaTQR-eX6i7fR6Rk"},
+  {name:"麥味登 北屯洲際店", addr:"台中市北屯區崇德十九路11號", rating:4.0, pid:"ChIJe9fPkWATaTQRuR4h21u29W4"},
+  {name:"弘爺漢堡 洲際店", addr:"台中市北屯區四平路568號", rating:4.2, pid:"ChIJZ6P_jGATaTQR5p5h8f4eI6Q"},
+  {name:"A-Bao House 四平店", addr:"台中市北屯區四平路372號", rating:3.9, pid:"ChIJW-L_jGATaTQR-mETaTQR6Rk"},
+  {name:"找餐店 Br超人 (北屯店)", addr:"台中市北屯區崇德路三段1號", rating:4.5, pid:"ChIJv-L_jGATaTQR-mETaTQR6S1"},
+  {name:"戶外家手作早午餐", addr:"台中市北屯區松竹路二段", rating:4.6, pid:"ChIJw-L_jGATaTQR-mETaTQR6S2"}
 ];
 
 const DINNER = [
-  {name:"NK.Restaurant 餐廳",         addr:"台中市西屯區大榮東街66號",        rating:4.9, pid:"ChIJCenoSv09aTQRk5aEwIdAOkY"},
-  {name:"SUNG Taichung Meicun",       addr:"台中市西區梅村路一段36號2樓",     rating:4.7, pid:"ChIJsQYoCa49aTQR9ZzYO1T8wY0"},
-  {name:"遊牧餐桌 Nomadic Trattoria", addr:"台中市西區中勤街184號",           rating:4.6, pid:"ChIJ0YDbHAo9aTQR-TQev9a1ZgU"},
-  {name:"Luxy Vivid Bistro",          addr:"台中市南屯區公益路二段699號",     rating:4.9, pid:"ChIJ1-C_9bY9aTQRiSdeFIp9HHs"},
-  {name:"VARMT（西區）",              addr:"台中市西區公正路133號",           rating:4.8, pid:"ChIJdQq_tDw9aTQR_LmXBczMgc0"},
-  {name:"山鑫 Shan Shin",             addr:"台中市西區村中街21號",            rating:4.8, pid:"ChIJS5F3U6E9aTQRutznLW2_oIg"},
-  {name:"Küisine",                    addr:"台中市西區模範街24巷1號",         rating:4.2, pid:"ChIJt3xYknU9aTQRkFvjUeAZLaM"},
-  {name:"千絡 にほんりょうり",         addr:"台中市西區村中街61巷1號",         rating:4.8, pid:"ChIJDzU7Q1E9aTQRTiri3RrghQo"},
-  {name:"吃光食堂",                   addr:"台中市西區五廊街12號",            rating:4.5, pid:"ChIJiffoTF09aTQRCD6E8HhIDPk"},
-  {name:"欣苑 Shin Yuan（西區）",     addr:"台中市西區民生北路106號",         rating:4.8, pid:"ChIJ5XBhggg9aTQRw_Ywe0gD8ac"},
-  {name:"三碗",                       addr:"台中市南區三民西路235號",         rating:4.7, pid:"ChIJcQPnGgA9aTQRGnh7KFPU92k"},
-  {name:"美村路魚市米糕",             addr:"台中市西區美村路一段52巷6號",     rating:4.1, pid:"ChIJjQq6aJw9aTQRoco5dMcm8yY"},
-  {name:"粥狂特色海鮮粥",             addr:"台中市西區向上路一段409號",       rating:4.7, pid:"ChIJu5Gi8uQ9aTQRUQdYX5FgvqQ"},
-  {name:"尤牧",                       addr:"台中市西區精誠20街48號",          rating:4.6, pid:"ChIJ40DOhbxHaTQRPbULBSTn3VA"},
-  {name:"六嘉",                       addr:"台中市西區笰行路200-13號",        rating:4.6, pid:"ChIJV_gbgKY9aTQRoz4fztIU0Wc"},
-  {name:"初月 砂鍋粥",                addr:"台中市西區台灣大道二段179巷12號", rating:4.5, pid:"ChIJk6AeqEc9aTQRYdHjLHMlGyo"},
-];
+  {name:"厝秘 功夫菜手路湯", addr:"台中市北屯區崇德八路一段18號", rating:4.5, pid:"ChIJU3yN6mETaTQRwE_9vU6eI6Q"},
+  {name:"藏壽司 台中崇德路店", addr:"台中市北屯區崇德十一路120號", rating:4.3, pid:"ChIJK1-f7mETaTQR-eX6i7fR6Rk"},
+  {name:"赤鬼炙燒牛排 崇德店", addr:"台中市北屯區文心路四段603號", rating:4.1, pid:"ChIJL3yN6mETaTQRwE_9vU6eI6R"},
+  {name:"築間幸福鍋物 北屯崇德店", addr:"台中市北屯區崇德路三段111號", rating:4.6, pid:"ChIJN3yN6mETaTQRwE_9vU6eI6T"},
+  {name:"春水堂 崇德店", addr:"台中市北屯區崇德路三段400號", rating:4.2, pid:"
 
 let mode = null, list = [], spinning = false, listOpen = false;
 
