@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今天吃什麼？</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080810;
+  --surface: #12121e;
+  --surface2: #1a1a2e;
+  --border: rgba(255,255,255,0.07);
+  --text: #eeeef4;
+  --muted: #6666aa;
+  --acc: #f59e0b;
+  --acc2: #fbbf24;
+  --acc-glow: rgba(245,158,11,0.2);
+}
+body.dinner {
+  --acc: #06b6d4;
+  --acc2: #22d3ee;
+  --acc-glow: rgba(6,182,212,0.18);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans TC', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem 4rem;
+}
+.wrap { width: 100%; max-width: 520px; }
+
+/* ── Header ── */
+.logo {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-align: center;
+  color: var(--acc);
+  text-shadow: 0 0 40px var(--acc-glow);
+  margin-bottom: .35rem;
+  transition: color .4s, text-shadow .4s;
+}
+.tagline { text-align: center; font-size: .8rem; color: var(--muted); margin-bottom: 2rem; letter-spacing: .08em; }
+
+/* ── Mode buttons ── */
+.modes { display: flex; gap: 10px; margin-bottom: 1.5rem; }
+.mode-btn {
+  flex: 1;
+  padding: 14px 10px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  color: var(--muted);
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .25s;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.mode-btn .ico { font-size: 1.6rem; }
+.mode-btn:hover { border-color: var(--acc); color: var(--text); }
+.mode-btn.on {
+  border-color: var(--acc);
+  background: var(--acc-glow);
+  color: var(--acc);
+}
+
+/* ── Slot machine frame ── */
+.machine {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 22px;
+  padding: 2rem 1.5rem 1.75rem;
+  margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+.machine::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--acc), transparent);
+  transition: background .4s;
+}
+
+.reel-label {
+  font-size: .7rem;
+  letter-spacing: .12em;
+  color: var(--muted);
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+/* ── Reel ── */
+.reel-outer {
+  height: 80px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+.reel-outer::before, .reel-outer::after {
+  content: ''; position: absolute; left: 0; right: 0; height: 22px; z-index: 3; pointer-events: none;
+}
+.reel-outer::before { top: 0; background: linear-gradient(to bottom, var(--bg), transparent); }
+.reel-outer::after  { bottom: 0; background: linear-gradient(to top,   var(--bg), transparent); }
+
+.reel-inner {
+  display: flex;
+  flex-direction: column;
+  transition: transform 3.2s cubic-bezier(0.08, 0.6, 0.25, 1);
+  will-change: transform;
+}
+.reel-item {
+  height: 80px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  font-weight: 700;
+  color: var(--text);
+  padding: 0 1rem;
+  text-align: center;
+  line-height: 1.3;
+}
+.reel-item.highlight { color: var(--acc); }
+
+/* placeholder text */
+.reel-placeholder {
+  height: 80px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  color: var(--muted);
+  padding: 0 1rem;
+  text-align: center;
+}
+
+/* ── Spin button ── */
+#spin-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--acc);
+  border: none;
+  border-radius: 12px;
+  color: #000;
+  font-family: 'Orbitron', monospace;
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: .1em;
+  cursor: pointer;
+  transition: all .2s;
+  position: relative;
+  overflow: hidden;
+}
+#spin-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0);
+  transition: background .15s;
+}
+#spin-btn:hover:not(:disabled)::after { background: rgba(255,255,255,0.12); }
+#spin-btn:active:not(:disabled) { transform: scale(0.98); }
+#spin-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── Result card ── */
+#result {
+  background: var(--surface2);
+  border: 1.5px solid var(--acc);
+  border-radius: 18px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  display: none;
+  animation: rise .35s ease;
+}
+@keyframes rise {
+  from { opacity:0; transform: translateY(12px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.result-eyebrow { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: .5rem; }
+.result-name { font-size: clamp(1.2rem, 4vw, 1.5rem); font-weight: 700; color: var(--acc); line-height: 1.3; margin-bottom: .4rem; }
+.result-addr { font-size: .82rem; color: var(--muted); margin-bottom: 1rem; }
+.result-foot { display: flex; align-items: center; gap: 8px; }
+.rating {
+  font-size: .78rem; color: var(--muted);
+  background: var(--surface); padding: 4px 10px;
+  border-radius: 20px;
+}
+.map-btn {
+  margin-left: auto;
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--acc); color: #000;
+  text-decoration: none;
+  font-size: .78rem; font-weight: 700;
+  padding: 7px 16px; border-radius: 20px;
+  transition: opacity .15s;
+}
+.map-btn:hover { opacity: .85; }
+.map-icon { width: 13px; height: 13px; flex-shrink: 0; }
+
+/* ── List ── */
+.list-toggle-wrap { text-align: center; }
+.list-toggle {
+  background: none; border: none; color: var(--muted);
+  font-family: 'Noto Sans TC', sans-serif; font-size: .78rem;
+  cursor: pointer; padding: 6px 14px;
+  transition: color .15s;
+}
+.list-toggle:hover { color: var(--text); }
+
+.store-list {
+  display: none;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  margin-top: .6rem;
+  overflow: hidden;
+}
+.store-list.open { display: block; }
+
+.list-head {
+  padding: .65rem 1rem;
+  font-size: .7rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+.store-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: .75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none; color: var(--text);
+  transition: background .12s;
+}
+.store-item:last-child { border-bottom: none; }
+.store-item:hover { background: rgba(255,255,255,0.03); }
+.si-info { flex: 1; min-width: 0; }
+.si-name { font-size: .88rem; font-weight: 500; }
+.si-addr { font-size: .72rem; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.si-star { font-size: .72rem; color: var(--muted); white-space: nowrap; }
+.si-arr  { font-size: .72rem; color: var(--muted); }
+
+/* kbd hint */
+.hint { text-align: center; font-size: .7rem; color: rgba(255,255,255,0.18); margin-top: 1.4rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="logo" id="logo">今天吃什麼？</div>
+  <p class="tagline">選擇障礙剋星 · 台中西區方圓兩公里</p>
+
+  <div class="modes">
+    <button class="mode-btn" id="btn-b" onclick="setMode('breakfast')">
+      <span class="ico">☀️</span>早餐
+    </button>
+    <button class="mode-btn" id="btn-d" onclick="setMode('dinner')">
+      <span class="ico">🌙</span>晚餐
+    </button>
+  </div>
+
+  <div class="machine">
+    <div class="reel-label">命中注定的今日餐廳</div>
+    <div class="reel-outer">
+      <div class="reel-inner" id="reel-inner">
+        <div class="reel-placeholder" id="reel-placeholder">← 請先選擇模式</div>
+      </div>
+    </div>
+    <button id="spin-btn" onclick="spin()" disabled>🎰 &nbsp; SPIN</button>
+  </div>
+
+  <div id="result">
+    <div class="result-eyebrow">🎉 今天就決定吃這家！</div>
+    <div class="result-name" id="r-name"></div>
+    <div class="result-addr" id="r-addr"></div>
+    <div class="result-foot">
+      <span class="rating" id="r-rating"></span>
+      <a class="map-btn" id="r-map" href="#" target="_blank">
+        <svg class="map-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Google Maps
+      </a>
+    </div>
+  </div>
+
+  <div class="list-toggle-wrap">
+    <button class="list-toggle" onclick="toggleList()" id="list-btn">查看所有店家 ▾</button>
+  </div>
+  <div class="store-list" id="store-list">
+    <div class="list-head" id="list-head">店家列表</div>
+    <div id="list-body"></div>
+  </div>
+
+  <p class="hint">按下 Space 鍵也可以抽籤</p>
+</div>
+
+<script>
+const BREAKFAST = [
+  {name:"怡寶吐司",            addr:"台中市西區花美街86號",              rating:4.8, pid:"ChIJC-uK3XI9aTQRoXxqGLMJNNo"},
+  {name:"港式良好早餐店",       addr:"台中市西區中城街38號",              rating:4.3, pid:"ChIJx4IAHCU9aTQR1U2WMHWH3xk"},
+  {name:"自製早餐店",           addr:"台中市西區永安街21號",              rating:4.6, pid:"ChIJAXvaLEA9aTQRqcZBDMSc_4M"},
+  {name:"嘉香早餐",             addr:"台中市南屯區大業路143號",           rating:4.2, pid:"ChIJtVJ51ZY9aTQRy2BJtIO8GFQ"},
+  {name:"三口ㄟ了（勤美店）",   addr:"台中市西區中興街55號",              rating:4.6, pid:"ChIJIafwbM49aTQRIx0JzvJ6IoY"},
+  {name:"路邊也！",             addr:"台中市西區中美街311號",             rating:4.6, pid:"ChIJzRFaMpk9aTQRXYq5nbmICTk"},
+  {name:"艾初早餐 英才店",      addr:"台中市西區英才路399號",             rating:4.4, pid:"ChIJdT01lMY9aTQRBvMya3mKs6Q"},
+  {name:"上山採蕨",             addr:"台中市西區昇平街43號",              rating:4.7, pid:"ChIJvcAlfwY9aTQRQ5vbnMOUbLY"},
+  {name:"中式早餐店",           addr:"台中市西區向上北路284巷22號",       rating:4.8, pid:"ChIJb5DmmQM9aTQRwmTACmbaoRY"},
+  {name:"Tacit Cafe",           addr:"台中市西區中美街185號",             rating:4.8, pid:"ChIJ6YfIalQ9aTQRbPFo2_LPdg4"},
+  {name:"食半晌米",             addr:"台中市西區大明街13號1樓",           rating:4.8, pid:"ChIJSYG6tE89aTQRBBVtPw496lI"},
+];
+
+const DINNER = [
+  {name:"NK.Restaurant 餐廳",         addr:"台中市西屯區大榮東街66號",        rating:4.9, pid:"ChIJCenoSv09aTQRk5aEwIdAOkY"},
+  {name:"SUNG Taichung Meicun",       addr:"台中市西區梅村路一段36號2樓",     rating:4.7, pid:"ChIJsQYoCa49aTQR9ZzYO1T8wY0"},
+  {name:"遊牧餐桌 Nomadic Trattoria", addr:"台中市西區中勤街184號",           rating:4.6, pid:"ChIJ0YDbHAo9aTQR-TQev9a1ZgU"},
+  {name:"Luxy Vivid Bistro",          addr:"台中市南屯區公益路二段699號",     rating:4.9, pid:"ChIJ1-C_9bY9aTQRiSdeFIp9HHs"},
+  {name:"VARMT（西區）",              addr:"台中市西區公正路133號",           rating:4.8, pid:"ChIJdQq_tDw9aTQR_LmXBczMgc0"},
+  {name:"山鑫 Shan Shin",             addr:"台中市西區村中街21號",            rating:4.8, pid:"ChIJS5F3U6E9aTQRutznLW2_oIg"},
+  {name:"Küisine",                    addr:"台中市西區模範街24巷1號",         rating:4.2, pid:"ChIJt3xYknU9aTQRkFvjUeAZLaM"},
+  {name:"千絡 にほんりょうり",         addr:"台中市西區村中街61巷1號",         rating:4.8, pid:"ChIJDzU7Q1E9aTQRTiri3RrghQo"},
+  {name:"吃光食堂",                   addr:"台中市西區五廊街12號",            rating:4.5, pid:"ChIJiffoTF09aTQRCD6E8HhIDPk"},
+  {name:"欣苑 Shin Yuan（西區）",     addr:"台中市西區民生北路106號",         rating:4.8, pid:"ChIJ5XBhggg9aTQRw_Ywe0gD8ac"},
+  {name:"三碗",                       addr:"台中市南區三民西路235號",         rating:4.7, pid:"ChIJcQPnGgA9aTQRGnh7KFPU92k"},
+  {name:"美村路魚市米糕",             addr:"台中市西區美村路一段52巷6號",     rating:4.1, pid:"ChIJjQq6aJw9aTQRoco5dMcm8yY"},
+  {name:"粥狂特色海鮮粥",             addr:"台中市西區向上路一段409號",       rating:4.7, pid:"ChIJu5Gi8uQ9aTQRUQdYX5FgvqQ"},
+  {name:"尤牧",                       addr:"台中市西區精誠20街48號",          rating:4.6, pid:"ChIJ40DOhbxHaTQRPbULBSTn3VA"},
+  {name:"六嘉",                       addr:"台中市西區笰行路200-13號",        rating:4.6, pid:"ChIJV_gbgKY9aTQRoz4fztIU0Wc"},
+  {name:"初月 砂鍋粥",                addr:"台中市西區台灣大道二段179巷12號", rating:4.5, pid:"ChIJk6AeqEc9aTQRYdHjLHMlGyo"},
+];
+
+let mode = null, list = [], spinning = false, listOpen = false;
+
+function mapUrl(pid){ return `https://www.google.com/maps/place/?q=place_id:${pid}`; }
+
+function setMode(m) {
+  mode = m; list = m === 'breakfast' ? BREAKFAST : DINNER;
+  document.body.className = m === 'dinner' ? 'dinner' : '';
+  document.getElementById('btn-b').className = 'mode-btn' + (m==='breakfast' ? ' on' : '');
+  document.getElementById('btn-d').className = 'mode-btn' + (m==='dinner'    ? ' on' : '');
+  const inner = document.getElementById('reel-inner');
+  inner.style.transition = 'none';
+  inner.innerHTML = `<div class="reel-item">按下 SPIN 開始抽！</div>`;
+  inner.style.transform = 'translateY(0)';
+  document.getElementById('spin-btn').disabled = false;
+  document.getElementById('result').style.display = 'none';
+  if (listOpen) renderList();
+}
+
+function spin() {
+  if (spinning || !list.length) return;
+  spinning = true;
+  const btn = document.getElementById('spin-btn');
+  btn.disabled = true;
+  document.getElementById('result').style.display = 'none';
+
+  const winner = list[Math.floor(Math.random() * list.length)];
+  const ITEM_H = 80;
+  const PREFIX = 55;
+
+  const arr = [];
+  for (let i = 0; i < PREFIX; i++) arr.push(list[Math.floor(Math.random() * list.length)]);
+  arr.push(winner);
+
+  const inner = document.getElementById('reel-inner');
+  inner.style.transition = 'none';
+  inner.style.transform = 'translateY(0)';
+  inner.innerHTML = arr.map((r, i) =>
+    `<div class="reel-item${i===arr.length-1?' highlight':''}">${r.name}</div>`
+  ).join('');
+
+  const targetY = -((arr.length - 1) * ITEM_H);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    inner.style.transition = 'transform 3.4s cubic-bezier(0.04, 0.7, 0.2, 1)';
+    inner.style.transform = `translateY(${targetY}px)`;
+  }));
+
+  setTimeout(() => {
+    showResult(winner);
+    spinning = false;
+    btn.disabled = false;
+  }, 3500);
+}
+
+function showResult(item) {
+  document.getElementById('r-name').textContent = item.name;
+  document.getElementById('r-addr').textContent = item.addr;
+  document.getElementById('r-rating').textContent = '⭐ ' + item.rating;
+  document.getElementById('r-map').href = mapUrl(item.pid);
+  const card = document.getElementById('result');
+  card.style.display = 'block';
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function toggleList() {
+  listOpen = !listOpen;
+  document.getElementById('store-list').className = 'store-list' + (listOpen ? ' open' : '');
+  document.getElementById('list-btn').textContent = listOpen ? '收起店家列表 ▴' : '查看所有店家 ▾';
+  if (listOpen) renderList();
+}
+
+function renderList() {
+  const head = document.getElementById('list-head');
+  const body = document.getElementById('list-body');
+  if (!mode) {
+    head.textContent = '店家列表';
+    body.innerHTML = '<div class="store-item" style="color:var(--muted)">請先選擇早餐或晚餐模式</div>';
+    return;
+  }
+  const label = mode === 'breakfast' ? '早餐' : '晚餐';
+  head.textContent = `${label}店家列表（共 ${list.length} 間）`;
+  body.innerHTML = list.map(r => `
+    <a class="store-item" href="${mapUrl(r.pid)}" target="_blank">
+      <div class="si-info">
+        <div class="si-name">${r.name}</div>
+        <div class="si-addr">${r.addr}</div>
+      </div>
+      <div class="si-star">★ ${r.rating}</div>
+      <div class="si-arr">↗</div>
+    </a>`).join('');
+}
+
+document.addEventListener('keydown', e => {
+  if ((e.code === 'Space' || e.code === 'Enter') && !e.target.matches('button,a,input')) {
+    e.preventDefault();
+    if (!document.getElementById('spin-btn').disabled) spin();
+  }
+});
+</script>
+</body>
+</html>
